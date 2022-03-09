@@ -1,6 +1,6 @@
 let boid = [];
-let nb_boid = 150;
-let lifeSpan = 300;
+let nb_boid = 100;
+let lifeSpan = 500;
 
 let matting_pool = [];
 
@@ -11,13 +11,15 @@ let c;
 
 let convergence, conv, fmax;
 let mutation_gain = 0.2;
-let selection_thr = 0.9;
+let selection_thr = 0.8;
 
 let trails;
 
+let boulder;
+
 function setup() {
-  createCanvas(800, 600);
-  trails = createGraphics(800, 600);
+  createCanvas(600,800);
+  trails = createGraphics(600,800);
 
   spawn = createVector(50, 50);
   target = createVector(width - 50, height - 50);
@@ -31,12 +33,17 @@ function setup() {
 
   convergence = new plot('convergence (%)', width - 100, 100, 0, 100, 0, 100, true);
   Pmean_conv = 0;
+
+  boulder = new obstacle(50, 100);
 }
 
 function draw() {
   background(220);
+
   image(trails, 0, 0);
   trails.stroke(255);
+
+  boulder.show();
 
   if (frame > lifeSpan - 1) {
     for (let i = 0; i < nb_boid; i++) {
@@ -45,8 +52,7 @@ function draw() {
       }
     }
 
-    trails.background(220, 127);
-    trails.filter(BLUR, 2);
+    trails.background(220, 50);
 
     conv = mean_conv();
     fmax = max_fitness();
@@ -62,6 +68,7 @@ function draw() {
     frame++;
   }
 
+
   //boids
   for (let i = 0; i < nb_boid; i++) {
     if (boid[i].finished == false) {
@@ -73,6 +80,8 @@ function draw() {
       trails.point(boid[i].pos.x, boid[i].pos.y);
     }
   }
+
+  
 
   noStroke();
   fill(0, 0, 25, 75);

@@ -2,7 +2,7 @@ class spaceship {
     constructor(x_, y_, lifeSpan_, command_ = []) {
         //position
         this.pos = createVector(x_, y_);
-        this.heading = 0;
+        this.heading = createVector(1,0).angleBetween(target);
 
         //speeds
         this.vel = createVector();
@@ -59,6 +59,15 @@ class spaceship {
             else if (this.pos.y > height) {
                 this.pos.y = height - (this.pos.y - height);
                 this.vel.y *= -1;
+            }
+
+            //check for obstacle
+            for (let i = 0; i < boulder.nb; i++) {
+                if (this.pos.dist(boulder.obstacles[i]) < boulder.sizes[i]/2) {
+                    let normal = createVector(boulder.obstacles[i].x - this.pos.x, boulder.obstacles[i].y - this.pos.y);
+                    this.vel.reflect(normal);
+                    this.pos.sub(normal-boulder.sizes[i]/2 + 5);
+                }
             }
 
             // friction
