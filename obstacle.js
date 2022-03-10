@@ -6,10 +6,11 @@ class obstacle {
         this.sizes = [];
         for (let i = 0; i < nb_; i++) {
             this.obstacles[i] = createVector(random(0, width), random(0, height));
-            while (this.obstacles[i].dist(spawn) < 200 | this.obstacles[i].dist(target) < 200) {
+            while (
+                this.obstacles[i].dist(spawn) < 200 | this.obstacles[i].dist(target) < 200) {
                 this.obstacles[i] = createVector(random(0, width), random(0, height));
             }
-            this.sizes[i] = random(0.3*size_, size_);
+            this.sizes[i] = random(0.3 * size_, size_);
         }
 
         this.show = function () {

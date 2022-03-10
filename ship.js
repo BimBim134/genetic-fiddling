@@ -2,7 +2,7 @@ class spaceship {
     constructor(x_, y_, lifeSpan_, command_ = []) {
         //position
         this.pos = createVector(x_, y_);
-        this.heading = createVector(1,0).angleBetween(target);
+        this.heading = createVector(1, 0).angleBetween(target);
 
         //speeds
         this.vel = createVector();
@@ -11,8 +11,8 @@ class spaceship {
         //acceleration
         this.acc = createVector();
         this.roll_rate = 0;
-        this.power = 0.75;
-        this.Rpower = 0.35;
+        this.power = 1;
+        this.Rpower = 2;
 
         // color
         let blue = random(100, 255);
@@ -63,16 +63,16 @@ class spaceship {
 
             //check for obstacle
             for (let i = 0; i < boulder.nb; i++) {
-                if (this.pos.dist(boulder.obstacles[i]) < boulder.sizes[i]/2) {
+                if (this.pos.dist(boulder.obstacles[i]) < boulder.sizes[i] / 2) {
                     let normal = createVector(boulder.obstacles[i].x - this.pos.x, boulder.obstacles[i].y - this.pos.y);
                     this.vel.reflect(normal);
-                    this.pos.sub(normal-boulder.sizes[i]/2 + 5);
+                    this.pos.sub(normal - boulder.sizes[i] / 2 + 5);
                 }
             }
 
             // friction
             this.vel.mult(0.95);
-            this.roll *= 0.9;
+            this.roll *= 0.95;
 
             // reinitialization acceleration
             this.acc.set(0, 0);
@@ -80,7 +80,10 @@ class spaceship {
 
             // fitness update
             if (this.finished == false) {
-                this.fitness = constrain(map(this.pos.dist(target), 0, spawn.dist(target), 1, 0), 0, 1);
+                let a = constrain(map(this.pos.dist(target), 0, spawn.dist(target), 1, 0), 0, 1);
+                if (a > this.fitness) {
+                    this.fitness = a;
+                }
             }
 
             if (this.pos.dist(target) < 25) {
@@ -89,14 +92,32 @@ class spaceship {
         }
 
         this.finish = function (frame) {
-            this.fitness *= map(frame / lifeSpan, 0, 1, 1, 0.35);
+            this.fitness *= map(frame / original_lifespan, 0, 1, 1, 0.35);
             this.finished = true;
+            if (frame < lifeSpan) {
+                best_time = frame;
+            }
+        }
+
+        this.reset = function () {
+            //position
+            this.pos = createVector(x_, y_);
+            this.heading = createVector(1, 0).angleBetween(target);
+
+            //speeds
+            this.vel = createVector();
+            this.roll = 0;
+
+            //acceleration
+            this.acc = createVector();
+            this.roll_rate = 0;
         }
 
         this.show = function (t) {
             push();
             translate(this.pos.x, this.pos.y);
             rotate(this.heading);
+            scale(0.65);
 
             // hull
             fill(this.paint);
@@ -124,7 +145,7 @@ class spaceship {
             /*
             fill(this.paint);
             noStroke();
-            text(floor(this.fitness),0,-3);
+            text(floor(this.fitness*10),0,-3);
             */
             pop();
         }

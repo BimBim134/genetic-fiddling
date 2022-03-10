@@ -13,6 +13,8 @@ function generate_matting_pool() {
         }
     }
 
+    let selection_thr = map(fmax,0,1,selection_thr_min,1);
+
     let pmean = lerp(fmin, fmax, selection_thr);
 
     // save only the ones above average
@@ -26,13 +28,13 @@ function generate_matting_pool() {
 
     let l = matting_pool.length;
     // avantage to the best
+    let bias;
     for (let i = 0; i < l; i++) {
-        for (let f = 0; f < pow(map(matting_pool[i].fitness, fmin, fmax, 0, 10), 3); f++) {
+        bias = pow(boid[i].fitness, 2);
+        for (let f = 0; f < bias * 10; f++) {
             append(matting_pool, matting_pool[f]);
         }
     }
-
-    //console.log(matting_pool.length);
 }
 
 function choose_btw(a, b) {
@@ -82,11 +84,24 @@ function mutation(gain) {
 }
 
 function max_fitness() {
-    let fmax = 0;
+    pfmax = fmax;
     for (let i = 0; i < nb_boid; i++) {
         if (boid[i].fitness > fmax) {
             fmax = boid[i].fitness;
         }
     }
-    return fmax;
+}
+
+function hero() {
+    for (let i = 0; i < nb_boid; i++) {
+        if (boid[i].fitness > fmax) {
+            arrayCopy(boid[i].command, best_command);
+        }
+    }
+}
+
+function checkConvergence(){
+    if(mutation_gain < 0.001 && fmax - conv < 0.05) {
+        converged = true;
+    }
 }
