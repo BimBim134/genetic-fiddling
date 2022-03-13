@@ -1,6 +1,6 @@
 let boid = [];
 let best_command = [];
-let nb_boid = 250;
+let nb_boid = 200;
 let lifeSpan, best_time;
 let original_lifespan = 500;
 
@@ -20,6 +20,8 @@ let trails;
 let boulder;
 
 let converged = false;
+
+let offscreen = false;
 
 function setup() {
   createCanvas(800, 800);
@@ -53,11 +55,11 @@ function draw() {
 
   boulder.show();
 
-  lifeSpan = best_time;
+  // lifeSpan = best_time;
 
   if (converged == false){
     if (frame > lifeSpan - 1) {
-      for (let i = 0; i < nb_boid; i++) {
+      for (let i = 0; i < boid.length; i++) {
         if (boid[i].finished == false) {
           boid[i].finish(frame);
         }
@@ -95,27 +97,39 @@ function draw() {
     }
   }
 
-
   //boids
-  if (converged == false) {
-    for (let i = 0; i < nb_boid; i++) {
-      if (boid[i].finished == false) {
-        boid[i].show(frame);
-        trails.point(boid[i].pos.x, boid[i].pos.y);
-        boid[i].simulate(frame);
-      } else {
-        boid[i].show(frame);
-        trails.point(boid[i].pos.x, boid[i].pos.y);
+  if (offscreen == false) {
+    frameRate(60);
+    if (converged == false) {
+      for (let i = 0; i < nb_boid; i++) {
+        if (boid[i].finished == false) {
+          boid[i].show(frame);
+          trails.point(boid[i].pos.x, boid[i].pos.y);
+          boid[i].simulate(frame);
+        } else {
+          boid[i].show(frame);
+          trails.point(boid[i].pos.x, boid[i].pos.y);
+        }
+  
+        
       }
-
-      
+    } else {
+      boid[0].show(frame);
+      trails.point(boid[0].pos.x, boid[0].pos.y);
+      boid[0].simulate(frame);
     }
   } else {
-    boid[0].show(frame);
-    trails.point(boid[0].pos.x, boid[0].pos.y);
-    boid[0].simulate(frame);
+    frameRate(1000);
+    if (converged == false) {
+      for (let i = 0; i < nb_boid; i++) {
+        if (boid[i].finished == false) {
+          boid[i].simulate(frame);
+        }
+      }
+    } else {
+      boid[0].simulate(frame);
+    }
   }
-
   checkConvergence();
 
   if (converged == false){
@@ -136,5 +150,12 @@ function draw() {
     text(frame + ' / ' + lifeSpan, width - 5, 20);
     text('mutation gain : ' + floor(mutation_gain * 10000) / 10000, width - 5, 180);
     pop();
+  }
+}
+
+function keyPressed() {
+  if (key == 'a') {
+    offscreen = !offscreen;
+    return false;
   }
 }
